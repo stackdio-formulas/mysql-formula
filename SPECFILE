@@ -1,0 +1,104 @@
+title: MySQL
+description: Formula for installing MySQL database client and/or server
+root_path: mysql
+components:
+  - title: MySQL
+    description: Meta-state that includes all server packages in the correct order.
+    sls_path: mysql
+  - title: MySQL Client
+    description: Install the MySQL client package.
+    sls_path: mysql.client
+  - title: MySQL Server
+    description: Install the MySQL server package and start the service.
+    sls_path: mysql.server
+  - title: Disable MySQL
+    description: Ensure that the MySQL service is not running.
+    sls_path: mysql.disabled
+  - title: MySQL Database
+    description: Create and manage MySQL databases.
+    sls_path: mysql.database
+  - title: MySQL Python
+    description: Install mysql python bindings.
+    sls_path: mysql.python
+  - title: MySQL User
+    description: Create and manage MySQL database users with definable GRANT privileges.
+    sls_path: mysql.user
+  - title: MySQL Remove Test DB
+    description: Remove the database called "test"
+    sls_path: mysql.remove_test_database
+  - title: MySQL Dev
+    description: Install the MySQL development libraries and header files.
+    sls_path: mysql.dev
+  - title: MySQL Repo
+    description: Add the official MySQL 5.7 repository.
+    sls_path: mysql.repo
+
+pillar_defaults:
+    mysql:
+      global:
+        client-server:
+          default_character_set: utf8
+
+      clients:
+        mysql:
+          default_character_set: utf8
+        mysqldump:
+          default_character_set: utf8
+
+      library:
+        client:
+          default_character_set: utf8
+
+      server:
+        # Use this account for database admin (defaults to root)
+        root_user: 'admin'
+        # root_password: '' - to have root@localhost without password
+        root_password: 'CHANGE_ME'
+        # root_password_hash: '*13883BDDBE566ECECC0501CDE9B293303116521A'
+        user: mysql
+        # If you only manage the dbs and users and the server is on
+        # another host
+        host: localhost
+        # my.cnf sections changes
+        mysqld:
+          # you can use either underscore or hyphen in param names
+          bind-address: 0.0.0.0
+          log_bin: /var/log/mysql/mysql-bin.log
+          datadir: /var/lib/mysql
+          port: 3306
+          # binlog_do_db: foo
+          auto_increment_increment: 5
+          binlog-ignore-db:
+           - mysql
+           - sys
+           - information_schema
+           - performance_schema
+        mysql:
+          # my.cnf param that not require value
+          no-auto-rehash: noarg_present
+
+      salt_user:
+        salt_user_name: 'salt'
+        salt_user_password: 'CHANGE_ME'
+        grants:
+          - 'all privileges'
+
+      # Manage databases
+      database: []
+      schema: {}
+
+      # Manage users
+      # you can get pillar for existing server using scripts/import_users.py script
+      user: {}
+
+      # Override any names defined in map.jinja
+    #  lookup:
+    #    server: mysql-server
+    #    client: mysql-client
+    #    service: mysql-service
+    #    python: python-mysqldb
+
+      # Install MySQL headers
+      dev:
+        # Install dev package - defaults to False
+        install: False
