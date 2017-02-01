@@ -1,4 +1,5 @@
 include:
+  - mysql.repo
   - mysql.config
   - mysql.python
 
@@ -84,8 +85,9 @@ mysql_install_datadir:
 mysqld-packages:
   pkg.installed:
     - name: {{ mysql.server }}
-{% if os_family == 'Debian' and mysql_root_password %}
     - require:
+      - pkgrepo: mariadb_repo
+{% if os_family == 'Debian' and mysql_root_password %}
       - debconf: mysql_debconf
 {% endif %}
     - require_in:
